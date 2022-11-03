@@ -8,12 +8,9 @@ end
 
 def clean_phone(phone)
   phone = phone.tr('^0-9', '')
-  return 'invalid phone number' unless phone.length == 10 || phone.length == 11
+  return 'invalid phone number' unless phone.length == 10 || phone.length == 11 && phone[0] == '1'
 
-  if phone.length == 11
-    phone[0] == '1' ? phone = phone[1..] : 'invalid phone number'
-  end
-  phone
+  phone[-10..]
 end
 
 def legislators_by_zipcode(zip)
