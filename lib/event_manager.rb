@@ -61,10 +61,6 @@ contents.each do |row|
 
   time = Time.strptime(date_of_login, '%m/%d/%Y %H:%M')
   array_of_hours << time.hour
-  results_hash = array_of_hours.tally
-  p results_hash
-  results_hash.
-
 
   legislators = legislators_by_zipcode(zipcode)
 
@@ -72,3 +68,16 @@ contents.each do |row|
 
   save_thank_you_letter(id, personal_letter)
 end
+
+keepgoing = true
+hash_of_hours = array_of_hours.tally
+best_times = []
+while keepgoing
+  peak = hash_of_hours.max_by { |hour, logs| logs }
+  p peak
+  best_times << peak
+  hash_of_hours.delete(peak[0])
+  if hash_of_hours.empty? then keepgoing =  false end
+end
+
+best_times
