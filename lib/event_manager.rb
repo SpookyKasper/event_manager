@@ -80,4 +80,6 @@ while keepgoing
   if hash_of_hours.empty? then keepgoing =  false end
 end
 
-best_times
+best_times.each do |value|
+  p "#{value[1]} people logged in at #{value[0]}h"
+end
