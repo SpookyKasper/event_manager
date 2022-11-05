@@ -15,6 +15,11 @@ def clean_phone(phone)
   phone[-10..]
 end
 
+def clean_hour(date)
+  Time.strptime(date, '%m/%d/%Y %H:%M').hour
+end
+
+
 def legislators_by_zipcode(zip)
   civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
   civic_info.key = 'AIzaSyClRzDqDh5MsXwnCWi0kOiiBivP6JsSyBw'
@@ -40,6 +45,16 @@ def save_thank_you_letter(id, personal_letter)
   end
 end
 
+def order_by_most_people_registering(times)
+  times.tally.sort {|a, b| a[1] <=> b[1] }.reverse
+end
+
+def print_results_to_human(results_array)
+  results_array.each do |v|
+    puts "So #{v[1]} people registered at #{v[0]}h"
+  end
+end
+
 contents = CSV.open(
   'event_attendees.csv',
   headers: true,
@@ -57,10 +72,8 @@ contents.each do |row|
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   phone = clean_phone(row[:homephone])
-  date_of_login = row[:regdate]
-
-  time = Time.strptime(date_of_login, '%m/%d/%Y %H:%M')
-  array_of_hours << time.hour
+  hour = clean_hour(row[:regdate])
+  array_of_hours << hour
 
   legislators = legislators_by_zipcode(zipcode)
 
@@ -69,17 +82,7 @@ contents.each do |row|
   save_thank_you_letter(id, personal_letter)
 end
 
-keepgoing = true
-hash_of_hours = array_of_hours.tally
-best_times = []
-while keepgoing
-  peak = hash_of_hours.max_by { |hour, logs| logs }
-  p peak
-  best_times << peak
-  hash_of_hours.delete(peak[0])
-  if hash_of_hours.empty? then keepgoing =  false end
-end
+results = order_by_most_people_registering(array_of_hours)
+print_results_to_human(results)
+puts "So the best times are #{results[0][0]}h and #{results[1][0]}h"
 
-best_times.each do |value|
-  p "#{value[1]} people logged in at #{value[0]}h"
-end
