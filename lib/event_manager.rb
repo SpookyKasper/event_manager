@@ -15,8 +15,8 @@ def clean_phone(phone)
   phone[-10..]
 end
 
-def clean_hour(date)
-  Time.strptime(date, '%m/%d/%Y %H:%M').hour
+def clean_date(date)
+  Time.strptime(date, '%m/%d/%Y %H:%M')
 end
 
 
@@ -45,14 +45,18 @@ def save_thank_you_letter(id, personal_letter)
   end
 end
 
-def sort_hours_by_most_present(array_of_hours)
-  array_of_hours.tally.sort {|a, b| a[1] <=> b[1] }.reverse
+def sort_array_by_most_present_values(array)
+  array.tally.sort {|a, b| a[1] <=> b[1] }.reverse
 end
 
-def human_readable_sorted_hours(best_hours)
-  best_hours.map do |v|
-    "#{v[1]} people registered at #{v[0]}h"
+def output_top_of_list(list, num, type)
+  i = 0
+  best = []
+  while i < num
+    best << list[i][0]
+    i += 1
   end
+  puts "So the best #{type} are #{best}"
 end
 
 contents = CSV.open(
@@ -66,15 +70,17 @@ puts 'EventMaganerInitialized'
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 array_of_hours = []
+array_of_days = []
 
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   phone = clean_phone(row[:homephone])
-  hour = clean_hour(row[:regdate])
-
+  hour = clean_date(row[:regdate]).hour
+  day = clean_date(row[:regdate]).strftime('%A')
   array_of_hours << hour
+  array_of_days << day
 
   legislators = legislators_by_zipcode(zipcode)
 
@@ -83,7 +89,8 @@ contents.each do |row|
   save_thank_you_letter(id, personal_letter)
 end
 
-sorted_hours = sort_hours_by_most_present(array_of_hours)
-puts human_readable_sorted_hours(sorted_hours)
-puts "So the best times are #{sorted_hours[0][0]}h and #{sorted_hours[1][0]}h"
+sorted_hours = sort_array_by_most_present_values(array_of_hours)
+sorted_days  = sort_array_by_most_present_values(array_of_days)
+output_top_of_list(sorted_hours, 3, 'hours')
+output_top_of_list(sorted_days, 3, 'days')
 
