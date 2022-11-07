@@ -45,13 +45,13 @@ def save_thank_you_letter(id, personal_letter)
   end
 end
 
-def order_by_most_people_registering(times)
-  times.tally.sort {|a, b| a[1] <=> b[1] }.reverse
+def sort_hours_by_most_present(array_of_hours)
+  array_of_hours.tally.sort {|a, b| a[1] <=> b[1] }.reverse
 end
 
-def print_results_to_human(results_array)
-  results_array.each do |v|
-    puts "#{v[1]} people registered at #{v[0]}h"
+def human_readable_sorted_hours(best_hours)
+  best_hours.map do |v|
+    "#{v[1]} people registered at #{v[0]}h"
   end
 end
 
@@ -73,6 +73,7 @@ contents.each do |row|
   zipcode = clean_zipcode(row[:zipcode])
   phone = clean_phone(row[:homephone])
   hour = clean_hour(row[:regdate])
+
   array_of_hours << hour
 
   legislators = legislators_by_zipcode(zipcode)
@@ -82,7 +83,7 @@ contents.each do |row|
   save_thank_you_letter(id, personal_letter)
 end
 
-results = order_by_most_people_registering(array_of_hours)
-print_results_to_human(results)
-puts "So the best times are #{results[0][0]}h and #{results[1][0]}h"
+sorted_hours = sort_hours_by_most_present(array_of_hours)
+puts human_readable_sorted_hours(sorted_hours)
+puts "So the best times are #{sorted_hours[0][0]}h and #{sorted_hours[1][0]}h"
 
