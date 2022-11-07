@@ -51,7 +51,7 @@ end
 
 def print_results_to_human(results_array)
   results_array.each do |v|
-    puts "So #{v[1]} people registered at #{v[0]}h"
+    puts "#{v[1]} people registered at #{v[0]}h"
   end
 end
 
